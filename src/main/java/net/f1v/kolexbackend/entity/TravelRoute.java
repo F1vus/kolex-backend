@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -39,9 +41,11 @@ public class TravelRoute {
     @Column(name = "travel_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "arrival_offset")
+    @Column(name = "arrival_offset", columnDefinition = "INTERVAL")
+    @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
     private Duration arrivalOffset;
 
-    @Column(name = "departure_offset")
+    @Column(name = "departure_offset", columnDefinition = "INTERVAL")
+    @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
     private Duration departureOffset;
 }
