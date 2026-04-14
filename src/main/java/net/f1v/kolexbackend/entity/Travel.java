@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,8 +28,9 @@ public class Travel {
     @Column(name = "travel_departure", nullable = false)
     private LocalDateTime departure;
 
-    @Column(name = "travel_duration", nullable = false)
-    private Duration duration;
+    @Column(name = "travel_duration", columnDefinition = "INTERVAL")
+    @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
+    private Duration travelDuration;
 
     @Column(name = "travel_train", nullable = false, length = 50)
     private String train;
