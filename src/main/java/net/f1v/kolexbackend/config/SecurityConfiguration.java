@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 class SecurityConfiguration {
 
-    @Value("${kolex_urls}")
+    @Value("${kolex-urls}")
     private List<String> allowedOrigins;
 
     @Bean
