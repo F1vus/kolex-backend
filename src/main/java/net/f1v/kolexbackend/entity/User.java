@@ -41,4 +41,8 @@ public class User {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    public boolean isAdmin() {
+        return role == UserRole.ADMIN;
+    }
 }

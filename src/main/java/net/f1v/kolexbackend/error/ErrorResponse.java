@@ -1,4 +1,4 @@
-package net.f1v.kolexbackend.dto;
+package net.f1v.kolexbackend.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

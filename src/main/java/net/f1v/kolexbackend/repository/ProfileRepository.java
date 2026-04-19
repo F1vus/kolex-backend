@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface ProfileRepository extends JpaRepository<Profile, Long> {
+public interface ProfileRepository extends JpaRepository<Profile, Long> {
     List<Profile> findByUserId(Long userId);
     Optional<Profile> findByIdAndUserId(Long profileId, Long userId);
 }
