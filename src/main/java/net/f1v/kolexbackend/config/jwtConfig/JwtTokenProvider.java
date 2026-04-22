@@ -31,14 +31,16 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", user.getAuthorities().stream()
+        claims.put("profileId", userPrincipal.getId());
+        claims.put("roles", userPrincipal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList());
 
         return Jwts.builder()
+                .subject(userPrincipal.getUsername())
                 .claims(claims)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
@@ -47,14 +49,10 @@ public class JwtTokenProvider {
     }
 
     public Long getProfileIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = getAllClaimsFromToken(token);
         return claims.get("profileId", Long.class);
     }
-
+    
     /** TODO
      * Generates a refresh token
      */

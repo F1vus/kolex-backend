@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.f1v.kolexbackend.config.jwtConfig.JwtTokenProvider;
+import net.f1v.kolexbackend.config.jwtConfig.UserPrincipal;
 import net.f1v.kolexbackend.dto.AuthResponse;
 import net.f1v.kolexbackend.dto.LoginRequest;
 import net.f1v.kolexbackend.dto.RegisterRequest;
@@ -73,11 +74,14 @@ public class AuthService {
         String token = jwtTokenProvider.generateToken(authentication);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
 
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+
         return AuthResponse.builder()
                 .token(token)
                 .refreshToken(refreshToken)
                 .type("Bearer")
                 .email(email)
+                .userId(principal.getId())
                 .build();
     }
 }
