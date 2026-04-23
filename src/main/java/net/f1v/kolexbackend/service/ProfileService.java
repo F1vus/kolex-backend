@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,10 +28,6 @@ public class ProfileService {
     @Transactional
     public ProfileResponse createProfile(ProfileRequest request) {
         User user = currentUser();
-
-        if (profileRepository.existsByUserId(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Profile already exists");
-        }
 
         Profile profile = Profile.builder()
                 .firstName(request.getFirstName())
@@ -44,40 +43,45 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public ProfileResponse getProfile() {
+    public List<ProfileResponse> getAllMyProfiles() {
         User user = currentUser();
-
-        Profile profile = profileRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
-
-        return toResponse(profile);
+        return profileRepository.findAllByUserId(user.getId())
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public ProfileResponse updateProfile(ProfileRequest request) {
+    public ProfileResponse updateProfile(Long profileId, ProfileRequest request) {
         User user = currentUser();
 
-        Profile profile = profileRepository.findByUserId(user.getId())
+        Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
+
+        if (!profile.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not your profile");
+        }
 
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
 
-        log.info("Updated profile id={} for user id={}", profile.getId(), user.getId());
-
         return toResponse(profile);
     }
 
     @Transactional
-    public void deleteProfile() {
+    public void deleteProfile(Long id) {
         User user = currentUser();
 
-        Profile profile = profileRepository.findByUserId(user.getId())
+        Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
+
+        if (!profile.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this profile");
+        }
 
         profileRepository.delete(profile);
 
-        log.info("Deleted profile for user id={}", user.getId());
+        log.info("Deleted profile id={} for user id={}", id, user.getId());
     }
 
     private User currentUser() {

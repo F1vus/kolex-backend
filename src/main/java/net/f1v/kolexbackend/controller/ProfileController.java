@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/profile")
 @RequiredArgsConstructor
@@ -32,22 +34,22 @@ public class ProfileController {
     }
 
     @GetMapping
-    @Operation(summary = "Get current user profile", description = "Retrieves profile of the authenticated user")
-    public ResponseEntity<ProfileResponse> getProfile() {
-        return ResponseEntity.ok(profileService.getProfile());
+    @Operation(summary = "Get current user profiles", description = "Retrieves profiles of the authenticated user")
+    public ResponseEntity<List<ProfileResponse>> getAllProfiles() {
+        return ResponseEntity.ok(profileService.getAllMyProfiles());
     }
 
-    @PutMapping("/change-profile")
-    @Operation(summary = "Update profile", description = "Updates profile of the authenticated user")
+    @PutMapping("/{id}")
+    @Operation(summary = "Update profile", description = "Updates provided profile of the authenticated user")
     public ResponseEntity<ProfileResponse> updateProfile(
+            @PathVariable Long id,
             @Valid @RequestBody ProfileRequest request) {
-
-        return ResponseEntity.ok(profileService.updateProfile(request));
+        return ResponseEntity.ok(profileService.updateProfile(id, request));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete profile", description = "Deletes profile of the authenticated user")
-    public void deleteProfile() {
-        profileService.deleteProfile();
+    public void deleteProfile(@PathVariable Long id) {
+        profileService.deleteProfile(id);
     }
 }
