@@ -82,7 +82,7 @@ class SecurityConfiguration {
                                 "/swagger-ui.html"
                         ).permitAll()
                         // Admin Panel
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         // Everything else
                         .anyRequest().authenticated()
                 )
