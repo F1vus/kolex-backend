@@ -12,6 +12,7 @@ import net.f1v.kolexbackend.entity.User;
 import net.f1v.kolexbackend.entity.UserRole;
 import net.f1v.kolexbackend.error.exceptions.EmailAlreadyExistsException;
 import net.f1v.kolexbackend.error.exceptions.InvalidCredentialsException;
+import net.f1v.kolexbackend.error.exceptions.PasswordsDoNotMatchException;
 import net.f1v.kolexbackend.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,6 +34,10 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         log.info("Register email={}", request.getEmail());
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordsDoNotMatchException("Passwords do not match");
+        }
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException("Email already in use: " + request.getEmail());
