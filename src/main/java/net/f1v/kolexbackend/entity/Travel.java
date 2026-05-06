@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "travels", schema = "backend")
+@Table(name = "travel", schema = "backend")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,5 +39,5 @@ public class Travel {
     private List<TravelRoute> routes;
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
-    private List<Place> places;
+    private List<Seat> seats;
 }

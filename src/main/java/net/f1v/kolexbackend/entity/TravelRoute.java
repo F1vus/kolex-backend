@@ -1,6 +1,7 @@
 package net.f1v.kolexbackend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.time.Duration;
 @Entity
 @Table(name = "travel_route", schema = "backend",
         uniqueConstraints = {
-                @UniqueConstraint(name = "un_travel_station",
+                @UniqueConstraint(name = "un_travel_route_station",
                         columnNames = {"travel_id", "travel_station_stop_id"})
         })
 @Getter
@@ -36,6 +37,7 @@ public class TravelRoute {
     private Station station;
 
     @Column(name = "travel_distance", nullable = false)
+    @Min(0)
     private Integer distance;
 
     @Column(name = "travel_price", nullable = false, precision = 10, scale = 2)
