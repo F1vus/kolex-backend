@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "seat_reservation", schema = "backend")
@@ -27,9 +28,9 @@ public class SeatReservation {
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seatReservation")
     @JoinColumn(name = "ticket_id", nullable = true)
-    private Ticket ticket;
+    private List<Ticket> ticket;
 
     @Column(name = "start_stop_number", nullable = false)
     private Integer startStopNumber;

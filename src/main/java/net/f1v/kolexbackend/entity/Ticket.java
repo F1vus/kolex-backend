@@ -45,6 +45,9 @@ public class Ticket {
     @Column(name = "ticket_created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    private SeatReservation seatReservation;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
