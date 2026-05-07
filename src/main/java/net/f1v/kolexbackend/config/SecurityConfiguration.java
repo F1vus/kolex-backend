@@ -81,6 +81,7 @@ class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        .requestMatchers("/api/metadata/**").permitAll()
                         // Admin Panel
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         // Everything else
