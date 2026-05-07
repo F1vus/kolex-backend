@@ -2,18 +2,16 @@ package net.f1v.kolexbackend.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "profile", schema = "backend")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Profile {
 
@@ -22,10 +20,10 @@ public class Profile {
     @Column(name = "profile_id")
     private Long id;
 
-    @Column(name = "profile_first_name", nullable = false, length = 255)
+    @Column(name = "profile_first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "profile_last_name", nullable = false, length = 255)
+    @Column(name = "profile_last_name", nullable = false)
     private String lastName;
 
     @Column(name = "profile_created_at", nullable = false, updatable = false)

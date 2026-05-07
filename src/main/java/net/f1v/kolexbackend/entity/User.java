@@ -9,10 +9,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "\"user\"", schema = "backend")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 public class User {
 
@@ -24,7 +24,7 @@ public class User {
     @Column(name = "user_email", unique = true, nullable = false, length = 254)
     private String email;
 
-    @Column(name = "user_password", nullable = false, length = 255)
+    @Column(name = "user_password", nullable = false)
     private String password;
 
     @Column(name = "user_created_at", nullable = false, updatable = false)
