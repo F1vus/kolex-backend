@@ -6,6 +6,7 @@ import net.f1v.kolexbackend.config.jwtConfig.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -70,11 +71,12 @@ class SecurityConfiguration {
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints & Login
-                        .requestMatchers("/api/auth/**", "/login", "/error").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/login", "/error", "/api/v1/search/**").permitAll()
                         // SWAGGER / OpenAPI Permit
                         .requestMatchers(
                                 "/v3/api-docs/**",

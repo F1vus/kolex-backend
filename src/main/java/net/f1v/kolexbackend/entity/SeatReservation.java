@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SeatReservation {
 
     @Id
@@ -28,7 +27,7 @@ public class SeatReservation {
     private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_id", nullable = true)
+    @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
     @Column(name = "start_stop_number", nullable = false)
@@ -51,4 +50,5 @@ public class SeatReservation {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
 }
