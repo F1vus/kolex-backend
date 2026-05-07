@@ -22,7 +22,6 @@ public class MetadataController {
 
     @GetMapping("/stations")
     @ApiResponse(responseCode = "200", description = "List of stations returned")
-    @ApiResponse(responseCode = "401", description = "Missing or invalid JWT")
     public ResponseEntity<List<StationResponse>> getAllStations() {
         return ResponseEntity.ok(metadataService.getAllStations());
     }
