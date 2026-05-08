@@ -43,7 +43,7 @@ class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -68,7 +68,7 @@ class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(final HttpSecurity http)  {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
@@ -76,7 +76,7 @@ class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints & Login
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/login", "/error", "/api/v1/search/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/login", "/error", "/api/search/**").permitAll()
                         // SWAGGER / OpenAPI Permit
                         .requestMatchers(
                                 "/v3/api-docs/**",
