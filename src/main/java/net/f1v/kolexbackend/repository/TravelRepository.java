@@ -21,7 +21,9 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
             "t.departure, " +
             "trStart.departureOffset, " +
             "trEnd.arrivalOffset, " +
-            "(trEnd.price - trStart.price)) " +
+            "(trEnd.price - trStart.price), " +
+            "trStart.id.travelStopNumber," +
+            "trEnd.id.travelStopNumber)"+
             "FROM Travel t " +
             "JOIN TravelRoute trStart ON t.id = trStart.id.travelId " +
             "JOIN TravelRoute trEnd ON t.id = trEnd.id.travelId " +
