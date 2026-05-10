@@ -3,6 +3,7 @@ package net.f1v.kolexbackend.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.f1v.kolexbackend.dto.BuyTicketResponse;
+import net.f1v.kolexbackend.dto.TopUpResponse;
 import net.f1v.kolexbackend.entity.*;
 import net.f1v.kolexbackend.error.exceptions.BusinessException;
 import net.f1v.kolexbackend.repository.*;
@@ -152,5 +153,16 @@ public class PaymentService {
         BigDecimal startPrice = routeRepository.findByTravelIdAndTravelStopNumber(travelId, start).getPrice();
         BigDecimal endPrice = routeRepository.findByTravelIdAndTravelStopNumber(travelId, end).getPrice();
         return endPrice.subtract(startPrice);
+    }
+
+    @Transactional
+    public TopUpResponse topUp(Long userId, BigDecimal amount) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found", HttpStatus.NOT_FOUND));
+
+        user.setBalance(user.getBalance().add(amount));
+        userRepository.save(user);
+
+        return new TopUpResponse(user.getBalance(), "Konto doładowane pomyślnie");
     }
 }

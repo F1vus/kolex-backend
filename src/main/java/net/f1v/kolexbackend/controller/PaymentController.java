@@ -2,9 +2,7 @@ package net.f1v.kolexbackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.f1v.kolexbackend.config.jwtConfig.UserPrincipal;
-import net.f1v.kolexbackend.dto.BuyRandomTicketRequest;
-import net.f1v.kolexbackend.dto.BuyTicketRequest;
-import net.f1v.kolexbackend.dto.BuyTicketResponse;
+import net.f1v.kolexbackend.dto.*;
 import net.f1v.kolexbackend.service.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,5 +33,12 @@ public class PaymentController {
                 request.getStartStop(),
                 request.getEndStop()
         );
+    }
+
+    @PostMapping("/top-up")
+    public TopUpResponse topUp(
+            @RequestBody TopUpRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return paymentService.topUp(userPrincipal.getId(), request.getAmount());
     }
 }
