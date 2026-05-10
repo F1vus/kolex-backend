@@ -28,8 +28,8 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String password;
 
-    @Column(name = "user_balance", nullable = false)
-    private BigDecimal balance = BigDecimal.ZERO;
+    @Column(name = "user_balance", insertable = false)
+    private BigDecimal balance;
 
     @Column(name = "user_created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
