@@ -2,6 +2,7 @@ package net.f1v.kolexbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.f1v.kolexbackend.entity.states.ReservationStatus;
 
 import java.time.LocalDateTime;
 

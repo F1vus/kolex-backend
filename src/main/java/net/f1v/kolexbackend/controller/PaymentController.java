@@ -35,6 +35,11 @@ public class PaymentController {
         );
     }
 
+    @PostMapping("/{ticketId}/refund")
+    public RefundResponseDto refundTicket(@PathVariable Long ticketId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return  paymentService.refundTicket(ticketId, userPrincipal.getId());
+    }
+
     @PostMapping("/top-up")
     public TopUpResponse topUp(
             @RequestBody TopUpRequest request,

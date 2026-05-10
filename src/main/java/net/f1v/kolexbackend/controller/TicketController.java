@@ -24,15 +24,10 @@ public class TicketController {
 
     @GetMapping
     public List<TicketResponseDto> getAllTickets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-
-
-        List<TicketResponseDto> ticketResponseDtos = ticketService.getAllTickets(userPrincipal.getId()).stream()
+        log.info("Get all tickets");
+        return ticketService.getAllTickets(userPrincipal.getId()).stream()
                 .map(this::mapToDto)
                 .toList();
-
-        log.info("getAllTickets {}", ticketResponseDtos);
-
-        return ticketResponseDtos;
     }
 
     private TicketResponseDto mapToDto(Ticket ticket) {
@@ -52,6 +47,7 @@ public class TicketController {
 
         return TicketResponseDto.builder()
                 .id(ticket.getId())
+                .travelId(travel.getId())
                 .trainName(travel.getTrain())
                 .profileName(ticket.getProfile().getFirstName() + " " + ticket.getProfile().getLastName())
                 .fromStationName(fromStation)

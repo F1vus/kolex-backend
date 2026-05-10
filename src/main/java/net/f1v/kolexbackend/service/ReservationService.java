@@ -2,7 +2,7 @@ package net.f1v.kolexbackend.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import net.f1v.kolexbackend.entity.ReservationStatus;
+import net.f1v.kolexbackend.entity.states.ReservationStatus;
 import net.f1v.kolexbackend.entity.Seat;
 import net.f1v.kolexbackend.entity.SeatReservation;
 import net.f1v.kolexbackend.repository.ProfileRepository;

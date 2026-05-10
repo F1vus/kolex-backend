@@ -2,6 +2,7 @@ package net.f1v.kolexbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.f1v.kolexbackend.entity.states.UserRole;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
