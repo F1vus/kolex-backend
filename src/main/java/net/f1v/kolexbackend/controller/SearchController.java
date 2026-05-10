@@ -3,7 +3,9 @@ package net.f1v.kolexbackend.controller;
 import lombok.RequiredArgsConstructor;
 import net.f1v.kolexbackend.dto.SeatStatusDTO;
 import net.f1v.kolexbackend.dto.TravelOptionDTO;
+import net.f1v.kolexbackend.dto.TravelStationDTO;
 import net.f1v.kolexbackend.repository.TravelRepository;
+import net.f1v.kolexbackend.repository.TravelRouteRepository;
 import net.f1v.kolexbackend.service.SeatService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import java.util.List;
 public class SearchController {
 
     private final TravelRepository travelRepository;
+    private final TravelRouteRepository travelRouteRepository;
     private final SeatService seatService;
 
     @GetMapping("/trains")
@@ -40,4 +43,10 @@ public class SearchController {
             @RequestParam int endStop) {
         return seatService.getSeatMap(travelId, startStop, endStop);
     }
+
+    @GetMapping("/stations")
+    public List<TravelStationDTO> getTravelStations(@RequestParam Long travelId) {
+        return travelRouteRepository.findAllStationsByTravelId(travelId);
+    }
+
 }
