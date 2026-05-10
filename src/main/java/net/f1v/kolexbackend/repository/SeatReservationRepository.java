@@ -1,11 +1,16 @@
 package net.f1v.kolexbackend.repository;
 
+import net.f1v.kolexbackend.entity.ReservationStatus;
 import net.f1v.kolexbackend.entity.SeatReservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+@Repository
 public interface SeatReservationRepository extends JpaRepository<SeatReservation, Long> {
 
     @Query("""
@@ -21,4 +26,8 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
         )
     """)
     List<SeatReservation> findActiveReservations(Long travelId);
+
+    List<SeatReservation> findAllByStatusAndExpiresAtBefore(ReservationStatus status, LocalDateTime now);
+
+    Optional<SeatReservation> findByIdAndProfileId(Long reservationId, Long profileId);
 }
