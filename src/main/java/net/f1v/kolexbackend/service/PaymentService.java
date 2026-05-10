@@ -128,6 +128,7 @@ public class PaymentService {
         ticket.setStartStopNumber(res.getStartStopNumber());
         ticket.setEndStopNumber(res.getEndStopNumber());
         ticket.setCreatedAt(LocalDateTime.now());
+        ticket.setSeat(res.getSeat());
         ticket = ticketRepository.save(ticket);
 
         // 7. Finalizing the reservation

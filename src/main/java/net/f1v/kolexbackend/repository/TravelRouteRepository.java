@@ -19,4 +19,7 @@ public interface TravelRouteRepository extends JpaRepository<TravelRoute, Travel
             "WHERE tr.id.travelId = :travelId " +
             "ORDER BY tr.id.travelStopNumber ASC")
     List<TravelStationDTO> findAllStationsByTravelId(@Param("travelId") Long travelId);
+
+    @Query("SELECT tr FROM TravelRoute tr WHERE tr.id.travelId = :travelId AND tr.id.travelStopNumber = :travelStopNumber")
+    TravelRoute findByTravelIdAndTravelStopNumber(@Param("travelId") Long travelId, @Param("travelStopNumber") Integer travelStopNumber);
 }

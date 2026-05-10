@@ -45,7 +45,7 @@ public class TicketController {
                 .orElse("Unknown Station");
 
         String toStation = travel.getRoutes().stream()
-                .filter(r -> r.getId().getTravelStopNumber() == ticket.getStartStopNumber())
+                .filter(r -> r.getId().getTravelStopNumber() == ticket.getEndStopNumber())
                 .map(r -> r.getStation().getName())
                 .findFirst()
                 .orElse("Unknown Station");
