@@ -34,6 +34,10 @@ public class Ticket {
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_id")
+    private Seat seat;
+
     @Column(name = "start_stop_number", nullable = false)
     @Min(1)
     private Integer startStopNumber;

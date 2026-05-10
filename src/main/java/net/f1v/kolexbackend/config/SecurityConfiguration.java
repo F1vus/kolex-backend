@@ -76,7 +76,7 @@ class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints & Login
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/login", "/error", "/api/search/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/login", "/error", "/api/search/**", "/api/reservations/**", "/api/payment/**").permitAll()
                         // SWAGGER / OpenAPI Permit
                         .requestMatchers(
                                 "/v3/api-docs/**",

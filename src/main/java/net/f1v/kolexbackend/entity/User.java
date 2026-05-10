@@ -3,6 +3,7 @@ package net.f1v.kolexbackend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class User {
 
     @Column(name = "user_password", nullable = false)
     private String password;
+
+    @Column(name = "user_balance", nullable = false)
+    private BigDecimal balance;
 
     @Column(name = "user_created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
