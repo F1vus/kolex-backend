@@ -29,7 +29,7 @@ public class User {
     private String password;
 
     @Column(name = "user_balance", nullable = false)
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Column(name = "user_created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
