@@ -1,4 +1,4 @@
-package net.f1v.kolexbackend.entity;
+package net.f1v.kolexbackend.entity.states;
 
 public enum UserRole {
     USER,

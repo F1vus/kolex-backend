@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Builder
 public class TicketResponseDto {
     private  Long id;
+    private Long travelId;
     private  String trainName;
     private  String profileName;
     private  String fromStationName;

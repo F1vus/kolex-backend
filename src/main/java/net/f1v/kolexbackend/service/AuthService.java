@@ -9,7 +9,7 @@ import net.f1v.kolexbackend.dto.AuthResponse;
 import net.f1v.kolexbackend.dto.LoginRequest;
 import net.f1v.kolexbackend.dto.RegisterRequest;
 import net.f1v.kolexbackend.entity.User;
-import net.f1v.kolexbackend.entity.UserRole;
+import net.f1v.kolexbackend.entity.states.UserRole;
 import net.f1v.kolexbackend.error.exceptions.EmailAlreadyExistsException;
 import net.f1v.kolexbackend.error.exceptions.InvalidCredentialsException;
 import net.f1v.kolexbackend.error.exceptions.PasswordsDoNotMatchException;
