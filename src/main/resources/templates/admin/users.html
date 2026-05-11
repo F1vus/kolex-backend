@@ -7,37 +7,25 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <a class="navbar-brand" th:href="@{/admin/dashboard}">
-        <img th:src="@{/images/Logo.svg}" alt="KOLEX">
-        <span>Panel administracyjny</span>
-    </a>
-    <ul class="navbar-nav">
-        <li><a th:href="@{/admin/trains}">🚂 Pociągi</a></li>
-        <li><a th:href="@{/admin/users}" class="active">👤 Użytkownicy</a></li>
-        <li><a th:href="@{/logout}">Wyloguj</a></li>
-    </ul>
-</nav>
+<nav th:replace="~{admin/fragments :: navbar('users')}"></nav>
 
 <div class="container">
     <p class="page-title">Zarządzanie użytkownikami</p>
 
-    <!-- Powiadomienia -->
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <!-- Wyszukiwarka -->
     <form th:action="@{/admin/users}" method="get" class="search-bar">
         <input class="form-control" type="text" name="search"
                th:value="${search}" placeholder="Szukaj po e-mail...">
-        <button type="submit" class="btn btn-primary">🔍 Szukaj</button>
-        <a th:href="@{/admin/users}" class="btn" style="background:#e0e0e0;color:#333;">Wyczyść</a>
+        <button type="submit" class="btn btn-primary">Szukaj</button>
+        <a th:href="@{/admin/users}" class="btn btn-muted">Wyczyść</a>
     </form>
 
-    <!-- Sekcja edycji użytkownika (pokazuje się tylko po kliknięciu Edytuj) -->
-    <div class="card" th:if="${userEdit}" style="border: 2px solid var(--primary); margin-bottom: 20px;">
-        <p class="card-title">Edytuj użytkownika: <span th:text="${userEdit.email}" style="color:var(--primary)"></span></p>
+    <div class="card" th:if="${userEdit}" style="border: 2px solid var(--green-dark); margin-bottom: 20px;">
+        <p class="card-title">Edytuj użytkownika: <span th:text="${userEdit.email}" style="color:var(--green-dark)"></span></p>
         <form th:action="@{/admin/users/update}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <input type="hidden" name="id" th:value="${userEdit.id}">
             <div class="form-grid">
                 <div class="form-group">
@@ -53,8 +41,8 @@
                 </div>
             </div>
             <div style="margin-top:16px;">
-                <button type="submit" class="btn btn-primary">💾 Zapisz zmiany</button>
-                <a th:href="@{/admin/users}" class="btn" style="background:#e0e0e0; color:black; margin-left:8px;">Anuluj</a>
+                <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                <a th:href="@{/admin/users}" class="btn btn-muted" style="margin-left:8px;">Anuluj</a>
             </div>
         </form>
     </div>
@@ -91,28 +79,30 @@
                               th:text="${u.enabled} ? 'Aktywny' : 'Zablokowany'">
                         </span>
                     </td>
-                    <td>
-                        <a th:href="@{/admin/users/{id}/edit(id=${u.id})}" class="btn btn-primary btn-sm" title="Edytuj dane">✏️</a>
+                    <td class="table-actions">
+                        <a th:href="@{/admin/users/{id}/edit(id=${u.id})}" class="btn btn-primary btn-sm" title="Edytuj dane">Edytuj</a>
 
                         <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}"
-                              method="post" style="display:inline;">
+                              method="post" class="inline-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                             <button type="submit" class="btn btn-sm"
                                     th:classappend="${u.enabled} ? 'btn-warning' : 'btn-success'"
-                                    th:text="${u.enabled} ? '🔒' : '🔓'"
+                                    th:text="${u.enabled} ? 'Zablokuj' : 'Odblokuj'"
                                     th:title="${u.enabled} ? 'Zablokuj' : 'Odblokuj'">
                             </button>
                         </form>
 
                         <form th:if="${u.role != null && u.role.name() != 'ADMIN'}"
                               th:action="@{/admin/users/{id}/delete(id=${u.id})}"
-                              method="post" style="display:inline;"
-                              th:onsubmit="|return confirm('Czy na pewno usunąć konto ${u.email}?')|">
-                            <button type="submit" class="btn btn-danger btn-sm" title="Usuń trwale">🗑</button>
+                              method="post" class="inline-form"
+                              onsubmit="return confirm('Czy na pewno trwale usunąć to konto?');">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-danger btn-sm" title="Usuń trwale">Usuń</button>
                         </form>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(users)}">
-                    <td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">
+                    <td colspan="7" class="table-empty">
                         Nie znaleziono użytkowników
                     </td>
                 </tr>

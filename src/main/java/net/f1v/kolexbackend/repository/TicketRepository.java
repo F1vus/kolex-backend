@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
+
+    boolean existsByTravel_Id(Long travelId);
+
     @Query("SELECT t FROM Ticket t " +
             "JOIN FETCH t.profile p " +
             "JOIN FETCH t.travel tr " +

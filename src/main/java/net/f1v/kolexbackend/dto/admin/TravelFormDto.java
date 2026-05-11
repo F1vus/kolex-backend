@@ -14,8 +14,11 @@ public class TravelFormDto {
     private Long id;
     private String train;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime departure;
+
+    /** Number of seats (1 … N) for this travel. */
+    private Integer seatCount;
 
     private List<StopFormDto> stops = new ArrayList<>();
 }

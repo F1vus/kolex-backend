@@ -6,13 +6,14 @@ import net.f1v.kolexbackend.config.jwtConfig.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,65 +67,35 @@ class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-//
-//    @Bean
-//    public SecurityFilterChain filterChain(final HttpSecurity http)  {
-//        return http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .cors(AbstractHttpConfigurer::disable)
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-//                .authorizeHttpRequests(auth -> auth
-//                        // Public endpoints & Login
-//                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//                        .requestMatchers("/api/auth/**", "/login", "/error").permitAll()
-//                        // SWAGGER / OpenAPI Permit
-//                        .requestMatchers(
-//                                "/v3/api-docs/**",
-//                                "/swagger-ui/**",
-//                                "/swagger-ui.html"
-//                        ).permitAll()
-//                        .requestMatchers("/api/metadata/**").permitAll()
-//                        // Admin Panel
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/css/**", "/images/**", "/js/**").permitAll()
-//                        // Everything else
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .defaultSuccessUrl("/admin/dashboard", true)
-//                        .permitAll()
-//                )
-//                .logout(logout -> logout
-//                        .logoutUrl("/logout")
-//                        .logoutSuccessUrl("/login?logout")
-//                )
-//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .build();
-//    }
 
     @Bean
-    public SecurityFilterChain filterChain(final HttpSecurity http) {
-        return http
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http)  {
+        http
+                .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/login", "/error").permitAll()
-                        // Zasoby statyczne
+                        .requestMatchers("/api/auth/**", "/api/metadata/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain adminFilterChain(HttpSecurity http) {
+        http
+                .securityMatcher((HttpServletRequest request) -> !request.getRequestURI().startsWith("/api/"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.ico").permitAll()
-                        // Swagger
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-                        .requestMatchers("/api/metadata/**").permitAll()
-                        // Admin Panel
+                        .requestMatchers("/login", "/error").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        // Everything else
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -135,9 +106,8 @@ class SecurityConfiguration {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                )
-                .addFilterBefore(jwtAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class)
-                .build();
+                );
+        return http.build();
     }
+
 }

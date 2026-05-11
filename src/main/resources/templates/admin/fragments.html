@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<body>
+<nav th:fragment="navbar (active)" class="navbar">
+    <a class="navbar-brand" th:href="@{/admin/dashboard}">
+        <img th:src="@{/images/Logo.svg}" alt="KOLEX">
+        <span>Panel administracyjny</span>
+    </a>
+    <ul class="navbar-nav">
+        <li>
+            <a th:href="@{/admin/trains}" class="nav-link"
+               th:classappend="${active == 'trains'} ? 'active'">Pociągi</a>
+        </li>
+        <li>
+            <a th:href="@{/admin/users}" class="nav-link"
+               th:classappend="${active == 'users'} ? 'active'">Użytkownicy</a>
+        </li>
+        <li>
+            <form th:action="@{/logout}" method="post" class="navbar-logout-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="navbar-logout-btn">Wyloguj</button>
+            </form>
+        </li>
+    </ul>
+</nav>
+</body>
+</html>

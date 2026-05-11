@@ -7,50 +7,48 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <a class="navbar-brand" th:href="@{/admin/dashboard}">
-        <img th:src="@{/images/Logo.svg}" alt="KOLEX">
-        <span>Panel administracyjny</span>
-    </a>
-    <ul class="navbar-nav">
-        <li><a th:href="@{/admin/trains}" class="active">🚂 Pociągi</a></li>
-        <li><a th:href="@{/admin/users}">👤 Użytkownicy</a></li>
-        <li><a th:href="@{/logout}">Wyloguj</a></li>
-    </ul>
-</nav>
+<nav th:replace="~{admin/fragments :: navbar('trains')}"></nav>
 
 <div class="container">
     <p class="page-title">Zarządzanie rozkładem jazdy</p>
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <!-- Formularz dodawania/edycji -->
     <div class="card">
         <p class="card-title"
            th:text="${travelForm.id != null} ? 'Edytuj połączenie' : 'Dodaj nowe połączenie'">
             Dodaj nowe połączenie
         </p>
 
-        <form th:action="@{/admin/trains/save}" method="post" th:object="${travelForm}">
+        <form id="travelForm" th:action="@{/admin/trains/save}" method="post" th:object="${travelForm}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <input type="hidden" th:field="*{id}">
 
-            <div class="form-grid" style="margin-bottom:16px;">
+            <div class="form-grid form-grid-3" style="margin-bottom:16px;">
                 <div class="form-group">
                     <label>Nazwa pociągu</label>
                     <input class="form-control" type="text" th:field="*{train}"
                            placeholder="np. Koleje Małopolskie SKA3" required>
                 </div>
                 <div class="form-group">
-                    <label>Data i godzina odjazdu</label>
-                    <input class="form-control" type="datetime-local"
-                           th:field="*{departure}" required>
+                    <label>Odjazd z pierwszej stacji</label>
+                    <input class="form-control" type="datetime-local" th:field="*{departure}" required>
+                </div>
+                <div class="form-group">
+                    <label>Liczba miejsc</label>
+                    <input class="form-control" type="number" th:field="*{seatCount}" min="1" max="2000" required>
                 </div>
             </div>
 
-            <!-- Przystanki -->
             <div style="margin-bottom:12px;">
                 <strong style="font-size:14px;">Przystanki</strong>
+                <p class="hint-text">
+                    Numery przystanków muszą być unikalne (1, 2, 3, …).
+                    <strong>Przyjazd</strong> i <strong>odjazd</strong> podaj jako pełną datę i godzinę (czas rzeczywisty na stacji).
+                    Wszystkie czasy muszą być nie wcześniejsze niż odjazd z pierwszej stacji powyżej.
+                    Wiersze bez wybranej stacji są ignorowane przy zapisie.
+                </p>
                 <div class="table-wrap" style="margin-top:8px;">
                     <table class="stops-table" id="stopsTable">
                         <thead>
@@ -59,25 +57,37 @@
                             <th>Stacja</th>
                             <th>Dystans (km)</th>
                             <th>Cena (zł)</th>
-                            <th>Przyjazd offset</th>
-                            <th>Odjazd offset</th>
+                            <th>Przyjazd</th>
+                            <th>Odjazd</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody id="stopsBody">
-                            <tr th:each="stop, i : *{stops}">
-                                <td><input type="number" class="form-control" th:name="|stops[${i.index}].stopNumber|" th:value="${stop.stopNumber}" required></td>
-                                <td>
-                                    <select class="form-control" th:name="|stops[${i.index}].stationId|" required>
-                                        <option th:each="st : ${stations}" th:value="${st.id}" th:text="${st.name}" th:selected="${st.id == stop.stationId}"></option>
-                                    </select>
-                                </td>
-                                <td><input type="number" class="form-control" th:name="|stops[${i.index}].distance|" th:value="${stop.distance}" required></td>
-                                <td><input type="number" step="0.01" class="form-control" th:name="|stops[${i.index}].price|" th:value="${stop.price}" required></td>
-                                <td><input type="number" class="form-control" th:name="|stops[${i.index}].arrivalMinutes|" th:value="${stop.arrivalMinutes}" placeholder="min" required></td>
-                                <td><input type="number" class="form-control" th:name="|stops[${i.index}].departureMinutes|" th:value="${stop.departureMinutes}" placeholder="min" required></td>
-                                <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✕</button></td>
-                            </tr>
+                        <tr th:each="stop, i : *{stops}">
+                            <td><input type="number" class="form-control" th:name="|stops[${i.index}].stopNumber|" th:value="${stop.stopNumber}" min="1" required></td>
+                            <td>
+                                <select class="form-control" th:name="|stops[${i.index}].stationId|" required>
+                                    <option value="" th:selected="${stop.stationId == null}">-- wybierz --</option>
+                                    <option th:each="st : ${stations}" th:value="${st.id}" th:text="${st.name}"
+                                            th:selected="${stop.stationId != null && st.id == stop.stationId}"></option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="form-control" th:name="|stops[${i.index}].distance|" th:value="${stop.distance}" min="0" required></td>
+                            <td><input type="number" step="0.01" class="form-control" th:name="|stops[${i.index}].price|" th:value="${stop.price}" min="0" required></td>
+                            <td>
+                                <input type="datetime-local" class="form-control"
+                                       th:name="|stops[${i.index}].arrivalTime|"
+                                       th:value="${stop.arrivalTime != null ? #temporals.format(stop.arrivalTime, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                                       required>
+                            </td>
+                            <td>
+                                <input type="datetime-local" class="form-control"
+                                       th:name="|stops[${i.index}].departureTime|"
+                                       th:value="${stop.departureTime != null ? #temporals.format(stop.departureTime, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                                       required>
+                            </td>
+                            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✕</button></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -88,7 +98,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">
-                💾 Zapisz połączenie
+                Zapisz połączenie
             </button>
             <a th:href="@{/admin/trains}" class="btn" style="background:#e0e0e0;color:#333;margin-left:8px;">
                 Anuluj
@@ -96,7 +106,6 @@
         </form>
     </div>
 
-    <!-- Lista połączeń -->
     <div class="card">
         <p class="card-title">Istniejące połączenia</p>
         <div class="table-wrap">
@@ -106,7 +115,8 @@
                     <th>ID</th>
                     <th>Pociąg</th>
                     <th>Data odjazdu</th>
-                    <th>Liczba przystanków</th>
+                    <th>Przystanki</th>
+                    <th>Miejsca</th>
                     <th>Akcje</th>
                 </tr>
                 </thead>
@@ -116,18 +126,20 @@
                     <td th:text="${t.train}"></td>
                     <td th:text="${#temporals.format(t.departure, 'dd.MM.yyyy HH:mm')}"></td>
                     <td th:text="${t.routes != null ? t.routes.size() : 0}"></td>
-                    <td>
+                    <td th:text="${t.seats != null ? t.seats.size() : 0}"></td>
+                    <td class="table-actions">
                         <a th:href="@{/admin/trains/{id}/edit(id=${t.id})}"
-                           class="btn btn-warning btn-sm">✏ Edytuj</a>
+                           class="btn btn-warning btn-sm">Edytuj</a>
                         <form th:action="@{/admin/trains/{id}/delete(id=${t.id})}"
-                              method="post" style="display:inline;"
+                              method="post" class="inline-form"
                               onsubmit="return confirm('Usunąć to połączenie?')">
-                            <button type="submit" class="btn btn-danger btn-sm">🗑 Usuń</button>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
                         </form>
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(travels)}">
-                    <td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">
+                    <td colspan="6" class="table-empty">
                         Brak połączeń w systemie
                     </td>
                 </tr>
@@ -138,35 +150,71 @@
 </div>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const stations = /*[[${stations}]]*/ [];
-    let stopIndex = /*[[${travelForm.stops != null ? travelForm.stops.size() : 0}]]*/ 0;
+    const stations = /*[[${stationOptions}]]*/ [];
+
+    function nextStopIndex() {
+        return document.getElementById('stopsBody').querySelectorAll('tr').length;
+    }
+
+    function departureDefault() {
+        const el = document.querySelector('input[name="departure"]');
+        return el && el.value ? el.value : '';
+    }
+
+    function renumberStopRows() {
+        const tbody = document.getElementById('stopsBody');
+        const rows = [...tbody.querySelectorAll('tr')];
+        rows.forEach((row, i) => {
+            row.querySelectorAll('input[name], select[name]').forEach(el => {
+                const n = el.name;
+                if (n && n.startsWith('stops[')) {
+                    el.name = n.replace(/stops\[\d+]/, 'stops[' + i + ']');
+                }
+            });
+        });
+    }
 
     function addStop() {
         const tbody = document.getElementById('stopsBody');
-        const idx = stopIndex++;
+        const idx = nextStopIndex();
         const row = document.createElement('tr');
+        const nextNum = idx + 1;
+        const dep = departureDefault();
 
-        // Dodaliśmy \ przed dolarem, żeby Thymeleaf tego nie parsował
         row.innerHTML = `
-            <td><input type="number" class="form-control" name="stops[${idx}].stopNumber" value="${idx + 1}" required></td>
-            <td>
-                <select class="form-control" name="stops[${idx}].stationId" required>
-                    <option value="">-- wybierz --</option>
-                    ${stations.map(s => `<option value="\${s.id}">\${s.name}</option>`).join('')}
-                </select>
-            </td>
-            <td><input type="number" class="form-control" name="stops[${idx}].distance" value="0" required></td>
-            <td><input type="number" step="0.01" class="form-control" name="stops[${idx}].price" value="0.00" required></td>
-            <td><input type="number" class="form-control" name="stops[${idx}].arrivalMinutes" value="0" required></td>
-            <td><input type="number" class="form-control" name="stops[${idx}].departureMinutes" value="0" required></td>
-            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✕</button></td>
-        `;
+        <td><input type="number" class="form-control" name="stops[${idx}].stopNumber" value="${nextNum}" min="1" required></td>
+        <td>
+            <select class="form-control" name="stops[${idx}].stationId" required>
+                <option value="">-- wybierz --</option>
+                ${stations.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}
+            </select>
+        </td>
+        <td><input type="number" class="form-control" name="stops[${idx}].distance" value="0" min="0" required></td>
+        <td><input type="number" step="0.01" class="form-control" name="stops[${idx}].price" value="0.00" min="0" required></td>
+        <td><input type="datetime-local" class="form-control" name="stops[${idx}].arrivalTime" value="${dep}" required></td>
+        <td><input type="datetime-local" class="form-control" name="stops[${idx}].departureTime" value="${dep}" required></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">✕</button></td>
+    `;
         tbody.appendChild(row);
+    }
+
+    document.getElementById('travelForm').addEventListener('submit', function () {
+        renumberStopRows();
+    });
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
     function removeRow(btn) {
         const row = btn.closest('tr');
         if (row) row.remove();
+        renumberStopRows();
     }
     /*]]>*/
 </script>

@@ -7,17 +7,7 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <a class="navbar-brand" th:href="@{/admin/dashboard}">
-        <img th:src="@{/images/Logo.svg}" alt="KOLEX">
-        <span>Panel administracyjny</span>
-    </a>
-    <ul class="navbar-nav">
-        <li><a th:href="@{/admin/trains}">🚂 Pociągi</a></li>
-        <li><a th:href="@{/admin/users}">👤 Użytkownicy</a></li>
-        <li><a th:href="@{/logout}">Wyloguj</a></li>
-    </ul>
-</nav>
+<nav th:replace="~{admin/fragments :: navbar('off')}"></nav>
 
 <div class="container">
     <p class="page-title">Dashboard</p>

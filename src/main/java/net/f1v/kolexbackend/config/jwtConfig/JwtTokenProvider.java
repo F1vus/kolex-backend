@@ -6,7 +6,6 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -46,11 +45,6 @@ public class JwtTokenProvider {
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
-    }
-
-    public Long getProfileIdFromToken(String token) {
-        Claims claims = getAllClaimsFromToken(token);
-        return claims.get("profileId", Long.class);
     }
     
     /** TODO
