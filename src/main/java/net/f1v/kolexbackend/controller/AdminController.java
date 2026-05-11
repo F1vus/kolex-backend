@@ -2,6 +2,7 @@ package net.f1v.kolexbackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.f1v.kolexbackend.dto.admin.TravelFormDto;
+import net.f1v.kolexbackend.entity.states.UserRole;
 import net.f1v.kolexbackend.service.AdminService;
 import net.f1v.kolexbackend.repository.StationRepository;
 import org.springframework.stereotype.Controller;
@@ -39,11 +40,10 @@ public class AdminController {
     }
 
     @PostMapping("/trains/save")
-    public String saveTrain(@ModelAttribute TravelFormDto form,
-                            RedirectAttributes ra) {
+    public String saveTrain(@ModelAttribute TravelFormDto form, RedirectAttributes ra) {
         try {
             adminService.saveTravel(form);
-            ra.addFlashAttribute("success", "Połączenie zapisane pomyślnie");
+            ra.addFlashAttribute("success", "Połączenie zapisane!");
         } catch (Exception e) {
             ra.addFlashAttribute("error", "Błąd: " + e.getMessage());
         }
@@ -62,11 +62,30 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String users(@RequestParam(required = false) String search,
-                        Model model) {
+    public String users(@RequestParam(required = false) String search, Model model) {
         model.addAttribute("users", adminService.searchUsers(search));
-        model.addAttribute("search", search);
+        model.addAttribute("roles", UserRole.values());
         return "admin/users";
+    }
+
+    @GetMapping("/users/{id}/edit")
+    public String editUser(@PathVariable Long id, Model model) {
+        model.addAttribute("userEdit", adminService.getUserById(id));
+        model.addAttribute("users", adminService.searchUsers(null));
+        model.addAttribute("roles", UserRole.values());
+        return "admin/users";
+    }
+
+    @PostMapping("/users/update")
+    public String updateUser(@RequestParam Long id, @RequestParam String email,
+                             @RequestParam UserRole role, RedirectAttributes ra) {
+        try {
+            adminService.updateUser(id, email, role);
+            ra.addFlashAttribute("success", "Użytkownik zaktualizowany!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Błąd: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
     }
 
     @PostMapping("/users/{id}/toggle")
