@@ -66,29 +66,30 @@ class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-    @Bean
-    public SecurityFilterChain filterChain(final HttpSecurity http)  {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints & Login
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/login", "/error").permitAll()
-                        // SWAGGER / OpenAPI Permit
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-                        .requestMatchers("/api/metadata/**").permitAll()
-                        // Admin Panel
+//
+//    @Bean
+//    public SecurityFilterChain filterChain(final HttpSecurity http)  {
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .cors(AbstractHttpConfigurer::disable)
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+//                .authorizeHttpRequests(auth -> auth
+//                        // Public endpoints & Login
+//                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//                        .requestMatchers("/api/auth/**", "/login", "/error").permitAll()
+//                        // SWAGGER / OpenAPI Permit
+//                        .requestMatchers(
+//                                "/v3/api-docs/**",
+//                                "/swagger-ui/**",
+//                                "/swagger-ui.html"
+//                        ).permitAll()
+//                        .requestMatchers("/api/metadata/**").permitAll()
+//                        // Admin Panel
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // Everything else
-                        .anyRequest().authenticated()
-                )
+//                        .requestMatchers("/css/**", "/images/**", "/js/**").permitAll()
+//                        // Everything else
+//                        .anyRequest().authenticated()
+//                )
 //                .formLogin(form -> form
 //                        .loginPage("/login")
 //                        .defaultSuccessUrl("/admin/dashboard", true)
@@ -98,7 +99,45 @@ class SecurityConfiguration {
 //                        .logoutUrl("/logout")
 //                        .logoutSuccessUrl("/login?logout")
 //                )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//    }
+
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) {
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/login", "/error").permitAll()
+                        // Zasoby statyczne
+                        .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.ico").permitAll()
+                        // Swagger
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .requestMatchers("/api/metadata/**").permitAll()
+                        // Admin Panel
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        // Everything else
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                )
+                .addFilterBefore(jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

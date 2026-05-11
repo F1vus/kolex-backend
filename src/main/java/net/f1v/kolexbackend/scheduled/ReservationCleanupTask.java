@@ -19,7 +19,7 @@ public class ReservationCleanupTask {
 
     private final SeatReservationRepository reservationRepository;
 
-    // Запускається кожну хвилину
+    // runs every minute
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void cleanExpiredReservations() {

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie – KOLEX Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .login-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.10);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+        .login-card img { height: 56px; }
+        .login-card h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .login-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .btn-login {
+            width: 100%;
+            height: 48px;
+            font-size: 15px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-card">
+        <img th:src="@{/images/Logo.svg}" alt="KOLEX">
+        <h1>Panel administracyjny</h1>
+
+        <div th:if="${param.error}" class="alert alert-error" style="width:100%;margin:0;">
+            Nieprawidłowy email lub hasło
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success" style="width:100%;margin:0;">
+            Wylogowano pomyślnie
+        </div>
+
+        <form th:action="@{/login}" method="post" class="login-form">
+            <div class="form-group">
+                <label>E-mail</label>
+                <input class="form-control" type="email" name="username"
+                       placeholder="admin@kolex.pl" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Hasło</label>
+                <input class="form-control" type="password" name="password"
+                       placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-login">
+                Zaloguj się
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

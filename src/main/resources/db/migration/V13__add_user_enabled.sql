@@ -1,0 +1,1 @@
+ALTER TABLE backend."user" ADD COLUMN user_enabled BOOLEAN NOT NULL DEFAULT TRUE;

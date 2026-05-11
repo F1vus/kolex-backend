@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Użytkownicy – KOLEX Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" th:href="@{/admin/dashboard}">
+        <img th:src="@{/images/Logo.svg}" alt="KOLEX">
+        <span>Panel administracyjny</span>
+    </a>
+    <ul class="navbar-nav">
+        <li><a th:href="@{/admin/trains}">🚂 Pociągi</a></li>
+        <li><a th:href="@{/admin/users}" class="active">👤 Użytkownicy</a></li>
+        <li><a th:href="@{/logout}">Wyloguj</a></li>
+    </ul>
+</nav>
+
+<div class="container">
+    <p class="page-title">Zarządzanie użytkownikami</p>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+    <!-- Wyszukiwarka -->
+    <form th:action="@{/admin/users}" method="get" class="search-bar">
+        <input class="form-control" type="text" name="search"
+               th:value="${search}" placeholder="Szukaj po e-mail...">
+        <button type="submit" class="btn btn-primary">🔍 Szukaj</button>
+        <a th:href="@{/admin/users}" class="btn" style="background:#e0e0e0;color:#333;">
+            Wyczyść
+        </a>
+    </form>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>E-mail</th>
+                    <th>Rola</th>
+                    <th>Saldo</th>
+                    <th>Data rejestracji</th>
+                    <th>Status</th>
+                    <th>Akcje</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${users}">
+                    <td th:text="${u.id}"></td>
+                    <td th:text="${u.email}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${u.role.name() == 'ADMIN'} ? 'badge-admin' : 'badge-active'"
+                              th:text="${u.role.name()}">
+                        </span>
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(u.balance, 1, 2)} + ' zł'"></td>
+                    <td th:text="${#temporals.format(u.createdAt, 'dd.MM.yyyy')}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${u.enabled} ? 'badge-active' : 'badge-blocked'"
+                              th:text="${u.enabled} ? 'Aktywny' : 'Zablokowany'">
+                        </span>
+                    </td>
+                    <td>
+                        <!-- Blokuj / Odblokuj -->
+                        <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}"
+                              method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm"
+                                    th:classappend="${u.enabled} ? 'btn-warning' : 'btn-success'"
+                                    th:text="${u.enabled} ? '🔒 Zablokuj' : '🔓 Odblokuj'">
+                            </button>
+                        </form>
+                        <!-- Usuń (tylko nie-admin) -->
+                        <form th:if="${u.role.name() != 'ADMIN'}"
+                              th:action="@{/admin/users/{id}/delete(id=${u.id})}"
+                              method="post" style="display:inline;"
+                              onsubmit="return confirm('Czy na pewno usunąć konto ' + /*[[${u.email}]]*/ '' + '?')">
+                            <button type="submit" class="btn btn-danger btn-sm">🗑 Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">
+                        Nie znaleziono użytkowników
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
