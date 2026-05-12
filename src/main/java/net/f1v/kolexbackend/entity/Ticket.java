@@ -3,6 +3,7 @@ package net.f1v.kolexbackend.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import net.f1v.kolexbackend.entity.states.TicketStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,6 +38,10 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seat_id")
     private Seat seat;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ticket_status", nullable = false, length = 20)
+    private TicketStatus status;
 
     @Column(name = "start_stop_number", nullable = false)
     @Min(1)

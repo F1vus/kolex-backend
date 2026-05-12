@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>KOLEX Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+<nav th:replace="~{admin/fragments :: navbar('off')}"></nav>
+
+<div class="container">
+    <p class="page-title">Dashboard</p>
+
+    <div class="dash-grid">
+        <a class="dash-card" th:href="@{/admin/trains}">
+            <div class="dash-icon">🚂</div>
+            <div>
+                <h2>Rozkład jazdy</h2>
+                <p>Dodawaj, edytuj i usuwaj połączenia kolejowe</p>
+            </div>
+        </a>
+        <a class="dash-card" th:href="@{/admin/users}">
+            <div class="dash-icon">👤</div>
+            <div>
+                <h2>Użytkownicy</h2>
+                <p>Zarządzaj kontami użytkowników systemu</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -9,9 +9,16 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TravelRepository extends JpaRepository<Travel, Long> {
+
+    @Query("select distinct t from Travel t left join fetch t.routes")
+    List<Travel> findAllWithRoutes();
+
+    @Query("select distinct t from Travel t left join fetch t.routes where t.id = :id")
+    Optional<Travel> findWithRoutesById(@Param("id") Long id);
 
     @Query("SELECT new net.f1v.kolexbackend.dto.TravelOptionDTO(" +
             "t.id, " +

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -35,9 +36,11 @@ public class Travel {
     @Column(name = "travel_train", nullable = false, length = 50)
     private String train;
 
+    @BatchSize(size = 32)
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
     private List<TravelRoute> routes;
 
-    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
+    @BatchSize(size = 32)
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Seat> seats;
 }

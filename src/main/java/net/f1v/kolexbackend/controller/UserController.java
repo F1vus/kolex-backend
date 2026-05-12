@@ -9,6 +9,7 @@ import net.f1v.kolexbackend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +27,10 @@ public class UserController {
                 .orElseThrow(() -> new BusinessException(
                         "User not found", HttpStatus.NOT_FOUND));
         return new UserBalanceResponse(user.getBalance());
+    }
+
+    @PostMapping("/delete")
+    public void deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        userRepository.deactivateUserById(userPrincipal.getId());
     }
 }

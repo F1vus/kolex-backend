@@ -1,6 +1,6 @@
 package net.f1v.kolexbackend.repository;
 
-import net.f1v.kolexbackend.entity.ReservationStatus;
+import net.f1v.kolexbackend.entity.states.ReservationStatus;
 import net.f1v.kolexbackend.entity.SeatReservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,9 +18,9 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
         FROM SeatReservation sr
         WHERE sr.seat.travel.id = :travelId
         AND (
-            sr.status = net.f1v.kolexbackend.entity.ReservationStatus.PURCHASED
+            sr.status = net.f1v.kolexbackend.entity.states.ReservationStatus.PURCHASED
             OR (
-                sr.status = net.f1v.kolexbackend.entity.ReservationStatus.HELD
+                sr.status = net.f1v.kolexbackend.entity.states.ReservationStatus.HELD
                 AND sr.expiresAt > CURRENT_TIMESTAMP
             )
         )
@@ -30,4 +30,6 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
     List<SeatReservation> findAllByStatusAndExpiresAtBefore(ReservationStatus status, LocalDateTime now);
 
     Optional<SeatReservation> findByIdAndProfileId(Long reservationId, Long profileId);
+
+    void deleteByTicketId(Long id);
 }

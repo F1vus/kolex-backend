@@ -2,6 +2,7 @@ package net.f1v.kolexbackend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.f1v.kolexbackend.entity.states.UserRole;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,6 +41,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Profile> profiles = new ArrayList<>();
+
+    @Column(name = "user_enabled", nullable = false)
+    private boolean enabled = true;
 
     @PrePersist
     protected void onCreate() {

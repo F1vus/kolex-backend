@@ -3,8 +3,11 @@ package net.f1v.kolexbackend.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.f1v.kolexbackend.dto.BuyTicketResponse;
+import net.f1v.kolexbackend.dto.RefundResponseDto;
 import net.f1v.kolexbackend.dto.TopUpResponse;
 import net.f1v.kolexbackend.entity.*;
+import net.f1v.kolexbackend.entity.states.ReservationStatus;
+import net.f1v.kolexbackend.entity.states.TicketStatus;
 import net.f1v.kolexbackend.error.exceptions.BusinessException;
 import net.f1v.kolexbackend.repository.*;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+    private static final BigDecimal REFUND_PERCENTAGE = BigDecimal.valueOf(15);
+
     private final SeatReservationRepository reservationRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
@@ -24,6 +29,7 @@ public class PaymentService {
     private final SeatRepository seatRepository;
     private final ProfileRepository profileRepository;
     private final TravelRepository travelRepository;
+    private final SeatReservationRepository seatReservationRepository;
 
     @Transactional
     public BuyTicketResponse purchaseRandomTicket(Long travelId, Long userId, Long profileId, int start, int end) {
@@ -59,6 +65,7 @@ public class PaymentService {
         ticket.setDepartureDate(departure);
         ticket.setStartStopNumber(start);
         ticket.setEndStopNumber(end);
+        ticket.setStatus(TicketStatus.PAID);
         ticket.setCreatedAt(LocalDateTime.now());
 
         availableSeat.ifPresent(ticket::setSeat);
@@ -130,6 +137,7 @@ public class PaymentService {
         ticket.setEndStopNumber(res.getEndStopNumber());
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setSeat(res.getSeat());
+        ticket.setStatus(TicketStatus.PAID);
         ticket = ticketRepository.save(ticket);
 
         // 7. Finalizing the reservation
@@ -138,6 +146,48 @@ public class PaymentService {
         reservationRepository.save(res);
 
         return new BuyTicketResponse(ticket.getId(), "Ticket purchased!");
+    }
+
+    @Transactional
+    public TopUpResponse topUp(Long userId, BigDecimal amount) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found", HttpStatus.NOT_FOUND));
+
+        user.setBalance(user.getBalance().add(amount));
+        userRepository.save(user);
+
+        return new TopUpResponse(user.getBalance(), "Konto doładowane pomyślnie");
+    }
+
+    @Transactional
+    public RefundResponseDto refundTicket(Long ticketId, Long userId) {
+        Ticket ticket = ticketRepository.getTicketByIdAndProfile_UserId(ticketId, userId);
+
+        if(ticket == null) {
+            throw new BusinessException("Ticket not found", HttpStatus.NOT_FOUND);
+        }
+
+        if (ticket.getStatus() == TicketStatus.REFUNDED) {
+            throw new BusinessException("Ticket is already refunded", HttpStatus.CONFLICT);
+        }
+
+        if (ticket.getDepartureDate().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("Cannot refund a ticket for a train that has already departed", HttpStatus.BAD_REQUEST);
+        }
+
+        BigDecimal refundAmount = calculateRefundAmount(ticket);
+
+        seatReservationRepository.deleteByTicketId(ticket.getId());
+        ticket.setSeat(null);
+        ticket.setStatus(TicketStatus.REFUNDED);
+
+        User user = ticket.getProfile().getUser();
+        user.setBalance(user.getBalance().add(refundAmount));
+
+        ticketRepository.save(ticket);
+        userRepository.save(user);
+
+        return new RefundResponseDto(ticket.getId(), refundAmount, "Refund successful");
     }
 
     private BigDecimal calculatePrice(SeatReservation res) {
@@ -155,14 +205,8 @@ public class PaymentService {
         return endPrice.subtract(startPrice);
     }
 
-    @Transactional
-    public TopUpResponse topUp(Long userId, BigDecimal amount) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException("User not found", HttpStatus.NOT_FOUND));
-
-        user.setBalance(user.getBalance().add(amount));
-        userRepository.save(user);
-
-        return new TopUpResponse(user.getBalance(), "Konto doładowane pomyślnie");
+    private BigDecimal calculateRefundAmount(Ticket ticket) {
+        return ticket.getPrice().multiply(REFUND_PERCENTAGE).divide(BigDecimal.valueOf(100));
     }
+
 }

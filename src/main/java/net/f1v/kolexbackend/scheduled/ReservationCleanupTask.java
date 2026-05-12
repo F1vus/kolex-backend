@@ -2,7 +2,7 @@ package net.f1v.kolexbackend.scheduled;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import net.f1v.kolexbackend.entity.ReservationStatus;
+import net.f1v.kolexbackend.entity.states.ReservationStatus;
 import net.f1v.kolexbackend.entity.SeatReservation;
 import net.f1v.kolexbackend.repository.SeatReservationRepository;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -19,7 +19,7 @@ public class ReservationCleanupTask {
 
     private final SeatReservationRepository reservationRepository;
 
-    // Запускається кожну хвилину
+    // runs every minute
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void cleanExpiredReservations() {
