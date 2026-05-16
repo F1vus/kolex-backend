@@ -24,9 +24,6 @@ public class Station {
     @Column(name = "station_name", nullable = false, unique = true, length = 150)
     private String name;
 
-    @Column(name = "station_city", nullable = false, length = 150)
-    private String city;
-
     @OneToMany(mappedBy = "station")
     private List<TravelRoute> routes;
 }

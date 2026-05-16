@@ -1,0 +1,1 @@
+ALTER TABLE backend.station DROP COLUMN station_city;
