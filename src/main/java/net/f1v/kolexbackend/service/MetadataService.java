@@ -21,7 +21,6 @@ public class MetadataService {
                 .map(station -> StationResponse.builder()
                         .id(station.getId())
                         .name(station.getName())
-                        .city(station.getCity())
                         .build())
                 .toList();
     }

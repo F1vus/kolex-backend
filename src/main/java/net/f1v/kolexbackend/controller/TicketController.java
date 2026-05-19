@@ -23,9 +23,11 @@ public class TicketController {
     private final TicketService ticketService;
 
     @GetMapping
-    public List<TicketResponseDto> getAllTickets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        log.info("Get all tickets");
-        return ticketService.getAllTickets(userPrincipal.getId()).stream()
+    public List<TicketResponseDto> getUserTickets(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        log.info("Get user tickets");
+
+        return ticketService.getPaidUserTickets(userPrincipal.getId())
+                .stream()
                 .map(this::mapToDto)
                 .toList();
     }

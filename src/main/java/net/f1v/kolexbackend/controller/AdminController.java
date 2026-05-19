@@ -134,7 +134,6 @@ public class AdminController {
                 .map(s -> StationResponse.builder()
                         .id(s.getId())
                         .name(s.getName())
-                        .city(s.getCity())
                         .build())
                 .toList();
     }
