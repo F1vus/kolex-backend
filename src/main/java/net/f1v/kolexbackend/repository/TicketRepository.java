@@ -1,7 +1,6 @@
 package net.f1v.kolexbackend.repository;
 
 import net.f1v.kolexbackend.entity.Ticket;
-import net.f1v.kolexbackend.entity.states.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,12 +17,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             "LEFT JOIN FETCH t.seat s " +
             "LEFT JOIN FETCH tr.routes route " +
             "WHERE p.user.id = :userId " +
-            "AND t.status = :status " +
+            "AND t.status = net.f1v.kolexbackend.entity.states.TicketStatus.PAID " +
             "ORDER BY tr.departure DESC")
-    List<Ticket> findByUserIdWithDetails(
-            @Param("userId") Long userId,
-            @Param("status") TicketStatus status
-    );
+    List<Ticket> findPaidTicketsByUserId(@Param("userId") Long userId);
 
     Ticket getTicketByIdAndProfile_UserId(Long ticketId, Long userId);
 }
